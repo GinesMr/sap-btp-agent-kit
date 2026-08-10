@@ -16,9 +16,7 @@
   "bugs": {
     "url": "https://github.com/GinesMr/sap-btp-agent-kit/issues"
   },
-  "bin": {
-    "sap-btp-agent-kit": "./bin/cli.js"
-  },
+  "bin": "./bin/cli.js",
   "files": [
     "bin/",
     "catalog/",
