@@ -1,22 +1,24 @@
 {
   "name": "@ginesmr/sap-btp-agent-kit",
-  "version": "1.0.0",
-  "description": "Agent-friendly SAP BTP knowledge base with skills, service catalog, guides and templates for CLI agents.",
+  "version": "1.0.1",
+  "description": "Agent-friendly SAP BTP knowledge base with interactive installer for Claude Code, Cursor, OpenCode, GitHub Copilot and Pi.",
   "keywords": [
     "sap", "btp", "sap-btp", "agent", "llm", "mcp", "knowledge-base",
-    "cap", "cloud-foundry", "kyma", "sap-b1", "ai-agent", "claude"
+    "cap", "cloud-foundry", "kyma", "sap-b1", "ai-agent", "claude", "cursor"
   ],
   "author": "GinesMr <gineesmartiinez@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/GinesMr/sap-btp-agent-kit#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GinesMr/sap-btp-agent-kit.git"
+    "url": "git+https://github.com/GinesMr/sap-btp-agent-kit.git"
   },
   "bugs": {
     "url": "https://github.com/GinesMr/sap-btp-agent-kit/issues"
   },
-  "bin": "./bin/cli.js",
+  "bin": {
+    "sap-btp-agent-kit": "./bin/cli.js"
+  },
   "files": [
     "bin/",
     "catalog/",
@@ -29,8 +31,5 @@
   ],
   "engines": {
     "node": ">=16.0.0"
-  },
-  "scripts": {
-    "prepublishOnly": "node -e \"console.log('Publishing @ginesmr/sap-btp-agent-kit v' + require('./package.json').version)\""
   }
 }
