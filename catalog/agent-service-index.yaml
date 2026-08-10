@@ -1,0 +1,1209 @@
+# SAP BTP Agent Service Index
+# Machine-readable index for CLI agents and AI tools.
+# All entries verified against official SAP documentation on 2026-08-10.
+# URLs marked REQUIRES_VALIDATION could not be confirmed at this time.
+# Source: https://help.sap.com/docs/btp and https://discovery-center.cloud.sap/
+
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-08-10"
+  source_root: "https://help.sap.com/docs/btp"
+  discovery_center: "https://discovery-center.cloud.sap/"
+  validation_note: >
+    Pricing, regional availability, and specific plan limits must always be
+    verified at discovery-center.cloud.sap before recommending to a customer.
+
+services:
+
+  # ─────────────────────────────────────────────────────────
+  # FOUNDATION & ACCOUNT MANAGEMENT
+  # ─────────────────────────────────────────────────────────
+
+  - id: btp-global-account
+    name: BTP Global Account
+    category: foundation-account-management
+    status: GA
+    short_description: >
+      Top-level account entity in BTP representing a contract with SAP.
+      Contains directories and subaccounts; manages entitlements and quotas.
+    best_for:
+      - Representing an SAP customer's BTP contract.
+      - Managing entitlements and allocating quotas to subaccounts.
+    avoid_when:
+      - As a direct deployment target — applications run in subaccounts.
+    prerequisites:
+      - SAP account and contract.
+    security_notes:
+      - Global account admins have full control — restrict to a small trusted group.
+      - Enable audit logging for admin actions.
+    runtime: []
+    related_services:
+      - btp-subaccount
+      - btp-directory
+      - btp-cockpit
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/account-model"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [foundation, account, entitlement, administration]
+
+  - id: btp-subaccount
+    name: BTP Subaccount
+    category: foundation-account-management
+    status: GA
+    short_description: >
+      Operative unit in BTP for deploying applications and consuming services.
+      Isolated environment with its own users, trust, entitlements, and quotas.
+    best_for:
+      - Isolating environments (DEV, TEST, PROD).
+      - Grouping services and applications per project or team.
+    avoid_when:
+      - Mixing production and non-production workloads in a single subaccount.
+    prerequisites:
+      - Global Account.
+    security_notes:
+      - Separate subaccounts for DEV / TEST / PROD.
+      - Apply distinct trust configurations per environment.
+    runtime:
+      - cloud-foundry
+      - kyma
+      - abap
+    related_services:
+      - btp-global-account
+      - btp-directory
+      - xsuaa
+      - ias
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/account-model"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [foundation, account, isolation, environment]
+
+  - id: btp-cockpit
+    name: SAP BTP Cockpit
+    category: foundation-account-management
+    status: GA
+    short_description: >
+      Web-based administration UI for managing global accounts, subaccounts,
+      entitlements, users, services, and deployments.
+    best_for:
+      - Day-to-day BTP administration.
+      - Managing entitlements and service instances.
+    avoid_when:
+      - Automating operations — use BTP CLI or Terraform instead.
+    prerequisites:
+      - BTP account.
+    security_notes:
+      - Assign cockpit roles via role collections; avoid using default admin role broadly.
+    runtime: []
+    related_services:
+      - btp-global-account
+      - btp-subaccount
+      - btp-cli
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/btp-cockpit"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [foundation, administration, ui, cockpit]
+
+  - id: btp-cli
+    name: SAP BTP CLI
+    category: foundation-account-management
+    status: GA
+    short_description: >
+      Command-line interface for managing BTP accounts, subaccounts, entitlements,
+      environments, and services programmatically.
+    best_for:
+      - Automating BTP administration tasks.
+      - CI/CD pipelines for BTP configuration.
+    avoid_when:
+      - One-off manual tasks where cockpit is faster.
+    prerequisites:
+      - BTP account.
+      - CLI installed locally.
+    security_notes:
+      - Use service accounts with minimal roles for CI/CD.
+    runtime: []
+    related_services:
+      - btp-cockpit
+      - btp-global-account
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/account-administration-using-sap-btp-command-line-interface-btp-cli"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [foundation, cli, automation, administration]
+
+  # ─────────────────────────────────────────────────────────
+  # RUNTIME ENVIRONMENTS
+  # ─────────────────────────────────────────────────────────
+
+  - id: cloud-foundry-environment
+    name: Cloud Foundry Environment
+    category: runtime-environment
+    status: GA
+    short_description: >
+      PaaS runtime based on Cloud Foundry open source. Supports Java, Node.js,
+      Python, Go, and other buildpack-based applications.
+    best_for:
+      - Running CAP (Node.js/Java) applications.
+      - Microservices with service broker integration.
+      - Teams familiar with 12-factor app methodology.
+    avoid_when:
+      - Containerized workloads requiring Kubernetes features.
+      - Stateful workloads or complex orchestration needs.
+    prerequisites:
+      - CF environment enabled in subaccount.
+      - Space created within CF org.
+    security_notes:
+      - XSUAA is the primary auth service for CF apps.
+      - Network isolation between orgs is platform-managed.
+    runtime: [cloud-foundry]
+    related_services:
+      - xsuaa
+      - destination-service
+      - connectivity-service
+      - hana-cloud
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/cloud-foundry-environment"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/cloud-foundry-runtime"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [runtime, cloud-foundry, paas, java, nodejs]
+
+  - id: kyma-environment
+    name: Kyma Environment
+    category: runtime-environment
+    status: GA
+    short_description: >
+      Managed Kubernetes runtime on BTP based on the open-source Kyma project.
+      Supports serverless functions, microservices, and event-driven workloads.
+    best_for:
+      - Containerized microservices.
+      - Event-driven architectures with Eventing.
+      - Teams with Kubernetes expertise.
+    avoid_when:
+      - Simple CRUD apps where CF + CAP is simpler.
+      - Teams without Kubernetes knowledge.
+    prerequisites:
+      - Kyma environment enabled in subaccount.
+      - kubectl configured.
+    security_notes:
+      - Use IAS-based OIDC for authentication (not XSUAA directly).
+      - Kubernetes RBAC for service-level access control.
+    runtime: [kyma]
+    related_services:
+      - ias
+      - hana-cloud
+      - event-mesh
+      - destination-service
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/kyma-environment"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/kyma-runtime"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [runtime, kyma, kubernetes, containers, serverless]
+
+  - id: abap-environment
+    name: ABAP Environment
+    category: runtime-environment
+    status: GA
+    short_description: >
+      Managed ABAP runtime on BTP for developing cloud-ready ABAP applications
+      using ABAP RESTful Application Programming Model (RAP).
+    best_for:
+      - ABAP developers extending S/4HANA or building new ABAP services.
+      - Building OData services from ABAP.
+    avoid_when:
+      - Non-ABAP projects.
+      - Direct migration of on-premise ABAP code without adaptation.
+    prerequisites:
+      - ABAP environment entitlement.
+      - ABAP development tools (Eclipse ADT).
+    security_notes:
+      - Users managed via IAS.
+      - Role-based access through business catalogs.
+    runtime: [abap]
+    related_services:
+      - ias
+      - hana-cloud
+    official_docs_url: "https://help.sap.com/docs/abap-cloud"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/abap-environment"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [runtime, abap, rap, s4hana, odata]
+
+  # ─────────────────────────────────────────────────────────
+  # DEVELOPMENT TOOLS
+  # ─────────────────────────────────────────────────────────
+
+  - id: cap
+    name: SAP Cloud Application Programming Model (CAP)
+    category: application-development
+    status: GA
+    short_description: >
+      Open-source framework for building enterprise-grade cloud applications.
+      Uses CDS for modeling, supports Node.js and Java runtimes, and generates
+      OData v4 / REST APIs automatically.
+    best_for:
+      - New BTP business applications.
+      - Rapid API development with OData.
+      - Full-stack apps with Fiori UI.
+    avoid_when:
+      - Pure Python or .NET applications (no native CAP support).
+      - Very simple static APIs with no data model.
+    prerequisites:
+      - Node.js or Java development environment.
+      - CF or Kyma runtime for deployment.
+    security_notes:
+      - CAP integrates natively with XSUAA for authorization.
+      - Use CDS annotations for declarative access control.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - hana-cloud
+      - xsuaa
+      - destination-service
+      - bas
+    official_docs_url: "https://cap.cloud.sap/docs/"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [development, cap, cds, nodejs, java, odata, api]
+
+  - id: bas
+    name: SAP Business Application Studio
+    category: application-development
+    status: GA
+    short_description: >
+      Cloud-based IDE on BTP, optimized for SAP development (CAP, Fiori, ABAP).
+      Runs in the browser; no local setup required.
+    best_for:
+      - SAP Fiori and CAP development in the cloud.
+      - Teams without uniform local dev environments.
+    avoid_when:
+      - Teams preferring local IDE (VS Code is the local alternative for CAP).
+    prerequisites:
+      - BAS entitlement in subaccount.
+    security_notes:
+      - Uses IAS for login.
+      - Git integration for source control.
+    runtime: []
+    related_services:
+      - cap
+      - cloud-foundry-environment
+      - kyma-environment
+    official_docs_url: "https://help.sap.com/docs/bas"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/business-application-studio"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [development, ide, fiori, cap, bas]
+
+  - id: build-code
+    name: SAP Build Code
+    category: application-development
+    status: GA
+    short_description: >
+      AI-powered development environment on BTP, built on BAS, with Joule
+      copilot integration for accelerating CAP and Fiori development.
+    best_for:
+      - Accelerating CAP + Fiori development with AI assistance.
+      - Rapid prototyping with Joule code generation.
+    avoid_when:
+      - Non-CAP / non-Fiori projects.
+      - Environments where Joule is not available.
+    prerequisites:
+      - Build Code entitlement.
+      - Joule availability in the region.
+    security_notes:
+      - Same security model as BAS.
+    runtime: []
+    related_services:
+      - bas
+      - cap
+      - joule
+    official_docs_url: "https://help.sap.com/docs/build-code"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-build-code"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [development, ai, joule, cap, fiori, low-code]
+
+  - id: cloud-sdk-java
+    name: SAP Cloud SDK (Java)
+    category: application-development
+    status: GA
+    short_description: >
+      Java library for building cloud-native applications on BTP with built-in
+      support for SAP system connectivity, resilience, and multi-tenancy.
+    best_for:
+      - Java/Spring Boot applications integrating with SAP S/4HANA or B1.
+      - OData client generation from SAP APIs.
+    avoid_when:
+      - Node.js or Python projects.
+    prerequisites:
+      - Java 11+.
+      - Maven or Gradle.
+    security_notes:
+      - SDK handles destination and XSUAA token exchange.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - destination-service
+      - xsuaa
+      - connectivity-service
+    official_docs_url: "https://sap.github.io/cloud-sdk/"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [development, java, sdk, odata, s4hana]
+
+  - id: cloud-sdk-js
+    name: SAP Cloud SDK (JavaScript / TypeScript)
+    category: application-development
+    status: GA
+    short_description: >
+      JavaScript/TypeScript library for building BTP applications with SAP system
+      connectivity, OData client generation, and resilience features.
+    best_for:
+      - Node.js / TypeScript CAP applications.
+      - OData client generation for SAP APIs in JS.
+    avoid_when:
+      - Java or Python projects.
+    prerequisites:
+      - Node.js 18+.
+    security_notes:
+      - Handles destination service and token exchange automatically.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - destination-service
+      - xsuaa
+      - cap
+    official_docs_url: "https://sap.github.io/cloud-sdk/docs/js/getting-started"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [development, javascript, typescript, sdk, odata]
+
+  # ─────────────────────────────────────────────────────────
+  # INTEGRATION & CONNECTIVITY
+  # ─────────────────────────────────────────────────────────
+
+  - id: integration-suite
+    name: SAP Integration Suite
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      SAP's cloud integration platform. Bundles Cloud Integration, API Management,
+      Open Connectors, Integration Advisor, and Event Mesh capabilities.
+    best_for:
+      - Enterprise-grade integration between SAP and non-SAP systems.
+      - iFlow-based message transformation and routing.
+      - API lifecycle management.
+    avoid_when:
+      - Simple point-to-point REST calls (use Destination + SDK instead).
+    prerequisites:
+      - Integration Suite subscription in subaccount.
+      - Appropriate capability activated (Cloud Integration, API Management, etc.).
+    security_notes:
+      - Use OAuth 2.0 for all API calls to/from Integration Suite.
+      - Store credentials in secure parameters, not in iFlow properties.
+    runtime: [cloud-foundry]
+    related_services:
+      - cloud-connector
+      - destination-service
+      - event-mesh
+      - open-connectors
+    official_docs_url: "https://help.sap.com/docs/integration-suite"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/integration-suite"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [integration, iflow, api, b2b, etl, messaging]
+
+  - id: cloud-integration
+    name: SAP Cloud Integration (CPI)
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      Capability within Integration Suite for designing, deploying, and monitoring
+      integration flows (iFlows) for message transformation, routing, and orchestration.
+    best_for:
+      - Complex message transformation (EDI, XML, JSON, CSV).
+      - Pre-packaged integration content for SAP systems.
+      - Orchestrating multi-step integration processes.
+    avoid_when:
+      - Real-time API proxying (use API Management).
+      - Simple data sync without transformation.
+    prerequisites:
+      - Integration Suite subscription with Cloud Integration capability enabled.
+    security_notes:
+      - Credentials stored in security artifacts (Secure Parameters).
+      - Mutual TLS for B2B connections.
+    runtime: [cloud-foundry]
+    related_services:
+      - integration-suite
+      - integration-advisor
+      - cloud-connector
+    official_docs_url: "https://help.sap.com/docs/cloud-integration"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [integration, iflow, etl, b2b, transformation]
+
+  - id: api-management
+    name: SAP API Management
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      API gateway and developer portal capability within Integration Suite.
+      Manages API policies (rate limiting, authentication, transformation),
+      monetization, and developer onboarding.
+    best_for:
+      - Publishing and governing enterprise APIs.
+      - Rate limiting, quota management, and analytics.
+      - Developer portal for API consumers.
+    avoid_when:
+      - Internal service-to-service calls not requiring governance.
+    prerequisites:
+      - Integration Suite subscription with API Management capability enabled.
+    security_notes:
+      - Enforce OAuth 2.0 on all published APIs.
+      - Use API keys only for low-risk public APIs.
+    runtime: [cloud-foundry]
+    related_services:
+      - integration-suite
+      - xsuaa
+      - destination-service
+    official_docs_url: "https://help.sap.com/docs/sap-api-management"
+    discovery_center_url: ""
+    verification_status: REQUIRES_VALIDATION
+    last_verified: "2026-08-10"
+    tags: [api, gateway, governance, developer-portal, rate-limiting]
+
+  - id: cloud-connector
+    name: SAP Cloud Connector
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      On-premise agent that creates a secure reverse tunnel between BTP and
+      on-premise systems. No inbound firewall rule required.
+    best_for:
+      - Accessing on-premise SAP systems (ERP, B1, HANA on-premise) from BTP.
+      - Hybrid integration without exposing on-premise network.
+    avoid_when:
+      - Cloud-to-cloud connections (use Destination directly).
+      - Systems already accessible via public API.
+    prerequisites:
+      - Java 11+ on the on-premise host.
+      - Network access to the BTP region endpoint.
+      - Connectivity Service entitlement in BTP subaccount.
+    security_notes:
+      - Cloud Connector runs on-premise; secure the host machine.
+      - Use only HTTPS (no HTTP) for tunneled connections.
+      - Restrict accessible resources to minimum required paths.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - connectivity-service
+      - destination-service
+      - integration-suite
+    official_docs_url: "https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/cloud-connector"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [connectivity, hybrid, on-premise, tunnel, secure]
+
+  - id: connectivity-service
+    name: SAP Connectivity Service
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      BTP service that enables applications to make outbound connections to
+      on-premise systems via Cloud Connector.
+    best_for:
+      - Applications that need to call on-premise systems.
+    avoid_when:
+      - Cloud-only connectivity (use Destination Service directly).
+    prerequisites:
+      - Connectivity Service entitlement.
+      - Cloud Connector installed and configured.
+    security_notes:
+      - All communication through Cloud Connector tunnel — no direct on-premise exposure.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - cloud-connector
+      - destination-service
+    official_docs_url: "https://help.sap.com/docs/connectivity"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [connectivity, on-premise, hybrid]
+
+  - id: destination-service
+    name: SAP Destination Service
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      Centralized repository for outbound connection configurations (URL, auth,
+      certificates) used by BTP applications to call remote systems.
+    best_for:
+      - Externalizing connection config from application code.
+      - Managing OAuth, certificates, and basic auth centrally.
+      - Avoiding hardcoded credentials.
+    avoid_when:
+      - Simple static API calls where config is unlikely to change.
+    prerequisites:
+      - Subaccount.
+      - Destination Service instance bound to application.
+    security_notes:
+      - Never store secrets in code — use Destination Service.
+      - Use OAuth 2.0 or Client Certificate types for production.
+      - Restrict destination access via roles.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - connectivity-service
+      - cloud-connector
+      - xsuaa
+    official_docs_url: "https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/destinations"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [connectivity, destination, credentials, api, hybrid]
+
+  - id: event-mesh
+    name: SAP Event Mesh
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      Managed messaging service on BTP supporting publish/subscribe and
+      queue-based messaging. Enables decoupled, asynchronous communication
+      between applications.
+    best_for:
+      - Event-driven architectures on BTP.
+      - Decoupling SAP systems from consumers.
+      - Asynchronous workflows.
+    avoid_when:
+      - High-throughput, multi-protocol streaming (use Advanced Event Mesh).
+    prerequisites:
+      - Event Mesh entitlement.
+      - Service plan selection (dev / default).
+    security_notes:
+      - Use OAuth 2.0 for messaging clients.
+      - Namespace-based topic isolation.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - advanced-event-mesh
+      - integration-suite
+      - cap
+    official_docs_url: "https://help.sap.com/docs/sap-event-mesh"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/event-mesh"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [messaging, events, pubsub, async, decoupled]
+
+  - id: advanced-event-mesh
+    name: SAP Advanced Event Mesh
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      Enterprise-grade event streaming and messaging service based on Solace
+      technology. Supports AMQP, MQTT, REST, JMS, and WebSocket protocols.
+    best_for:
+      - High-throughput, low-latency event streaming.
+      - Multi-protocol event distribution.
+      - IoT and real-time data scenarios.
+    avoid_when:
+      - Simple queue-based messaging where Event Mesh is sufficient.
+    prerequisites:
+      - Separate entitlement from Event Mesh.
+      - Verify availability in required region.
+    security_notes:
+      - OAuth 2.0 and TLS mandatory.
+      - Dedicated broker instances for isolation.
+    runtime: [cloud-foundry, kyma, standalone]
+    related_services:
+      - event-mesh
+      - integration-suite
+    official_docs_url: "https://help.sap.com/docs/sap-advanced-event-mesh"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/advanced-event-mesh"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [messaging, events, streaming, amqp, mqtt, high-throughput]
+
+  - id: open-connectors
+    name: SAP Open Connectors
+    category: integration-connectivity
+    status: GA
+    short_description: >
+      Pre-built connectors to 150+ third-party cloud applications (Salesforce,
+      ServiceNow, Slack, etc.) within Integration Suite.
+    best_for:
+      - Rapid integration with popular SaaS applications.
+      - Normalizing diverse APIs into a unified interface.
+    avoid_when:
+      - Connecting to on-premise systems (use Cloud Connector).
+      - Custom APIs not covered by available connectors.
+    prerequisites:
+      - Integration Suite subscription with Open Connectors capability.
+    security_notes:
+      - Credentials for third-party systems stored securely in Open Connectors.
+    runtime: [cloud-foundry]
+    related_services:
+      - integration-suite
+      - cloud-integration
+    official_docs_url: "https://help.sap.com/docs/open-connectors"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [integration, connectors, saas, third-party]
+
+  # ─────────────────────────────────────────────────────────
+  # DATA & ANALYTICS
+  # ─────────────────────────────────────────────────────────
+
+  - id: hana-cloud
+    name: SAP HANA Cloud
+    category: data-analytics
+    status: GA
+    short_description: >
+      Cloud-native in-memory database supporting SQL, graph, spatial, document
+      store, and vector engine capabilities. The primary database for BTP apps.
+    best_for:
+      - Persistent relational data for CAP applications.
+      - In-memory analytics and real-time data processing.
+      - Vector storage for RAG workloads (verify version).
+    avoid_when:
+      - Simple key-value storage (use Object Store or Redis alternatives).
+      - Cost-sensitive scenarios where PostgreSQL suffices.
+    prerequisites:
+      - HANA Cloud entitlement.
+      - Service instance in subaccount.
+    security_notes:
+      - Encrypt data at rest and in transit.
+      - Use HANA Cloud HDI containers for app isolation.
+      - No direct SQL access from external agents.
+    runtime: [cloud-foundry, kyma, standalone]
+    related_services:
+      - cap
+      - datasphere
+      - ai-core
+    official_docs_url: "https://help.sap.com/docs/hana-cloud"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-hana-cloud"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [database, hana, sql, inmemory, vector, analytics]
+
+  - id: datasphere
+    name: SAP Datasphere
+    category: data-analytics
+    status: GA
+    short_description: >
+      Cloud data warehouse and data integration platform. Provides data federation,
+      replication, modeling, and data marketplace capabilities.
+    best_for:
+      - Enterprise data warehouse on BTP.
+      - Federating data from multiple sources without replication.
+      - Data governance and semantic modeling.
+    avoid_when:
+      - Transactional OLTP workloads (use HANA Cloud).
+      - Simple application persistence.
+    prerequisites:
+      - Datasphere subscription (separate from HANA Cloud).
+    security_notes:
+      - Role-based access to spaces and models.
+      - Data encryption and compliance controls built-in.
+    runtime: [standalone]
+    related_services:
+      - hana-cloud
+      - analytics-cloud
+    official_docs_url: "https://help.sap.com/docs/SAP_DATASPHERE"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-datasphere"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [data, warehouse, federation, analytics, governance]
+
+  - id: analytics-cloud
+    name: SAP Analytics Cloud (SAC)
+    category: data-analytics
+    status: GA
+    short_description: >
+      Cloud-based BI, planning, and predictive analytics platform. Connects to
+      HANA Cloud, Datasphere, and external data sources.
+    best_for:
+      - Business intelligence dashboards and reports.
+      - Financial planning and forecasting.
+      - Embedded analytics in SAP applications.
+    avoid_when:
+      - Real-time operational dashboards with sub-second latency requirements.
+    prerequisites:
+      - SAC subscription (separate licensing).
+    security_notes:
+      - SSO via IAS; row-level security on models.
+    runtime: [standalone]
+    related_services:
+      - hana-cloud
+      - datasphere
+    official_docs_url: "https://help.sap.com/docs/SAP_ANALYTICS_CLOUD"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-analytics-cloud"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [analytics, bi, planning, dashboards, reporting]
+
+  # ─────────────────────────────────────────────────────────
+  # AI & MACHINE LEARNING
+  # ─────────────────────────────────────────────────────────
+
+  - id: ai-core
+    name: SAP AI Core
+    category: ai-machine-learning
+    status: GA
+    short_description: >
+      Managed AI infrastructure on BTP for training ML models, deploying inference
+      endpoints, and accessing generative AI capabilities via Generative AI Hub.
+    best_for:
+      - Production ML model training and deployment.
+      - Accessing LLMs via SAP Generative AI Hub.
+      - AI scenario management and orchestration.
+    avoid_when:
+      - Simple rule-based automation (use Build Process Automation).
+      - Scenarios where a SAP Business AI embedded feature covers the need.
+    prerequisites:
+      - AI Core entitlement.
+      - Service instance in subaccount.
+      - Resource group configured.
+    security_notes:
+      - Use AI Core's built-in secret management.
+      - Govern model access via resource groups and roles.
+      - Do not expose inference endpoints publicly without API gateway.
+    runtime: [cloud-foundry, kyma, standalone]
+    related_services:
+      - ai-launchpad
+      - hana-cloud
+      - destination-service
+    official_docs_url: "https://help.sap.com/docs/sap-ai-core"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [ai, ml, llm, training, inference, generative-ai]
+
+  - id: ai-launchpad
+    name: SAP AI Launchpad
+    category: ai-machine-learning
+    status: GA
+    short_description: >
+      Web UI for managing AI scenarios, models, deployments, and datasets
+      registered in SAP AI Core. Provides MLOps lifecycle management.
+    best_for:
+      - Monitoring and managing AI Core deployments.
+      - Data scientists and ML engineers managing model lifecycle.
+    avoid_when:
+      - Programmatic ML pipeline management (use AI Core APIs directly).
+    prerequisites:
+      - AI Core instance.
+      - AI Launchpad entitlement.
+    security_notes:
+      - Roles control access to specific AI Core resource groups.
+    runtime: [standalone]
+    related_services:
+      - ai-core
+    official_docs_url: "https://help.sap.com/docs/ai-launchpad"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-ai-launchpad"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [ai, mlops, model-management, ui]
+
+  - id: generative-ai-hub
+    name: SAP Generative AI Hub
+    category: ai-machine-learning
+    status: GA
+    short_description: >
+      Capability within SAP AI Core providing unified access to large language
+      models (GPT-4, Claude, Gemini, open-source models) via a standardized API.
+    best_for:
+      - Building LLM-powered applications on BTP.
+      - Accessing multiple LLM providers from one endpoint.
+      - Prompt management and model evaluation.
+    avoid_when:
+      - Direct API calls to external LLM providers are sufficient and cost is a concern.
+    prerequisites:
+      - AI Core entitlement with Generative AI Hub plan.
+      - Model deployed in resource group.
+    security_notes:
+      - All LLM requests proxied through SAP — data stays in SAP's infrastructure.
+      - Input/output logging configurable.
+    runtime: [standalone]
+    related_services:
+      - ai-core
+      - ai-launchpad
+      - hana-cloud
+    official_docs_url: "https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/generative-ai-hub-in-sap-ai-core"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [ai, llm, generative, gpt, claude, openai, foundation-model]
+
+  # ─────────────────────────────────────────────────────────
+  # SECURITY & IDENTITY
+  # ─────────────────────────────────────────────────────────
+
+  - id: ias
+    name: SAP Identity Authentication Service (IAS)
+    category: security-identity
+    status: GA
+    short_description: >
+      Cloud identity provider supporting SAML 2.0, OpenID Connect, and MFA.
+      Acts as SP, IdP, or proxy IdP for BTP applications and SAP cloud products.
+    best_for:
+      - Authenticating users for BTP applications.
+      - Federating with corporate IdPs (Azure AD, Okta, ADFS).
+      - Enforcing MFA and risk-based authentication.
+    avoid_when:
+      - Service-to-service auth (use OAuth 2.0 via XSUAA or IAS client credentials).
+    prerequisites:
+      - IAS tenant (provisioned with BTP global account or separately).
+    security_notes:
+      - Configure MFA for all admin and privileged users.
+      - Restrict risk-based authentication rules.
+      - Manage corporate IdP trust carefully.
+    runtime: [cloud-foundry, kyma, abap, standalone]
+    related_services:
+      - ips
+      - xsuaa
+    official_docs_url: "https://help.sap.com/docs/cloud-identity-services"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/identity-authentication"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [security, identity, sso, saml, oidc, mfa]
+
+  - id: ips
+    name: SAP Identity Provisioning Service (IPS)
+    category: security-identity
+    status: GA
+    short_description: >
+      Automates user and group provisioning between identity systems using SCIM.
+      Syncs users from LDAP, Azure AD, or IAS to BTP and SAP systems.
+    best_for:
+      - Automated user lifecycle management.
+      - Syncing users from corporate directories to BTP.
+    avoid_when:
+      - Manual, small-scale user management.
+    prerequisites:
+      - IPS entitlement (bundled with Cloud Identity Services).
+    security_notes:
+      - Least privilege for provisioning connectors.
+      - Audit user sync operations.
+    runtime: [standalone]
+    related_services:
+      - ias
+      - xsuaa
+    official_docs_url: "https://help.sap.com/docs/cloud-identity-services"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [security, identity, provisioning, scim, user-management]
+
+  - id: xsuaa
+    name: Authorization and Trust Management (XSUAA)
+    category: security-identity
+    status: GA
+    short_description: >
+      SAP's OAuth 2.0 authorization server on Cloud Foundry. Issues JWT tokens,
+      manages scopes, role templates, and role collections for BTP applications.
+    best_for:
+      - Authorization in CF-based applications.
+      - Service-to-service OAuth flows (client credentials).
+      - Token exchange for calling backend SAP systems.
+    avoid_when:
+      - Kyma-native applications (prefer IAS-based OIDC directly).
+    prerequisites:
+      - CF environment.
+      - XSUAA service instance with xs-security.json.
+    security_notes:
+      - Define minimal scope sets.
+      - Do not share XSUAA instances between services.
+      - Token expiry: configure short-lived access tokens.
+    runtime: [cloud-foundry]
+    related_services:
+      - ias
+      - cap
+      - application-router
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/authorization-and-trust-management-in-cloud-foundry-environment"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [security, oauth, jwt, authorization, scopes, roles]
+
+  - id: audit-log
+    name: SAP Audit Log Service
+    category: security-identity
+    status: GA
+    short_description: >
+      Managed service for storing security audit logs from BTP applications
+      and services. Supports compliance and forensic investigation.
+    best_for:
+      - Compliance (GDPR, SOX, ISO 27001) audit trails.
+      - Security monitoring of BTP admin and user actions.
+    avoid_when:
+      - Application-level logging (use Cloud Logging instead).
+    prerequisites:
+      - Audit Log entitlement.
+    security_notes:
+      - Audit logs are immutable once written.
+      - Control access to audit log viewer strictly.
+    runtime: [cloud-foundry, kyma, standalone]
+    related_services:
+      - cloud-logging
+      - ias
+    official_docs_url: "https://help.sap.com/docs/btp/sap-business-technology-platform/audit-log-service"
+    discovery_center_url: ""
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [security, audit, compliance, logging, gdpr]
+
+  - id: credential-store
+    name: SAP Credential Store
+    category: security-identity
+    status: GA
+    short_description: >
+      Managed secure storage for credentials, passwords, keys, and certificates
+      used by BTP applications.
+    best_for:
+      - Storing secrets needed by BTP applications at runtime.
+      - Replacing hardcoded credentials in configuration.
+    avoid_when:
+      - HSM-grade key management is required (not an HSM service).
+    prerequisites:
+      - Credential Store entitlement.
+    security_notes:
+      - Access controlled via OAuth.
+      - Credentials encrypted at rest.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - xsuaa
+      - destination-service
+    official_docs_url: "https://help.sap.com/docs/credential-store"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/credential-store"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [security, secrets, credentials, vault]
+
+  # ─────────────────────────────────────────────────────────
+  # AUTOMATION & LOW-CODE
+  # ─────────────────────────────────────────────────────────
+
+  - id: build-apps
+    name: SAP Build Apps
+    category: automation-low-code
+    status: GA
+    short_description: >
+      No-code / low-code visual application builder for web and mobile apps.
+      Does not require ABAP or CAP knowledge.
+    best_for:
+      - Line-of-business users building custom apps.
+      - Rapid mobile and web app prototyping.
+    avoid_when:
+      - Complex backend logic requiring CAP or Java (use Build Code instead).
+    prerequisites:
+      - SAP Build Apps entitlement.
+    security_notes:
+      - IAS-based authentication.
+      - Permissions defined via role collections.
+    runtime: [standalone]
+    related_services:
+      - build-process-automation
+      - build-work-zone
+    official_docs_url: "https://help.sap.com/docs/build-apps"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-build-apps"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [low-code, no-code, mobile, web, drag-and-drop]
+
+  - id: build-process-automation
+    name: SAP Build Process Automation
+    category: automation-low-code
+    status: GA
+    short_description: >
+      Low-code platform for workflow automation, RPA (robotic process automation),
+      business rules, forms, and approval processes.
+    best_for:
+      - Automating approval workflows.
+      - RPA bots for repetitive UI tasks.
+      - Business rule engines.
+    avoid_when:
+      - Complex custom backend integrations (use Integration Suite).
+    prerequisites:
+      - SAP Build Process Automation entitlement.
+    security_notes:
+      - Bot credentials secured via credential vault.
+      - Human approval steps for sensitive operations.
+    runtime: [standalone]
+    related_services:
+      - build-apps
+      - build-work-zone
+      - integration-suite
+    official_docs_url: "https://help.sap.com/docs/build-process-automation"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-build-process-automation"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [automation, rpa, workflow, approval, low-code]
+
+  - id: build-work-zone
+    name: SAP Build Work Zone
+    category: automation-low-code
+    status: GA
+    short_description: >
+      Digital workplace platform for creating centralized Fiori launchpads,
+      business sites, and collaborative workspaces.
+    best_for:
+      - Unified SAP Fiori launchpad for multiple apps.
+      - Employee portal and collaboration workspaces.
+    avoid_when:
+      - Pure API scenarios with no user-facing UI requirement.
+    prerequisites:
+      - SAP Build Work Zone Standard or Advanced Edition entitlement.
+    security_notes:
+      - IAS for SSO.
+      - Role collections for app visibility.
+    runtime: [standalone]
+    related_services:
+      - ias
+      - build-apps
+      - cap
+    official_docs_url: "https://help.sap.com/docs/build-work-zone-standard-edition"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-build-work-zone"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [portal, fiori, launchpad, workspace, low-code]
+
+  # ─────────────────────────────────────────────────────────
+  # OPERATIONS & OBSERVABILITY
+  # ─────────────────────────────────────────────────────────
+
+  - id: cloud-logging
+    name: SAP Cloud Logging
+    category: operations-observability
+    status: GA
+    short_description: >
+      Managed log management and analysis service on BTP. Ingests logs from
+      CF, Kyma, and custom applications. Based on OpenSearch.
+    best_for:
+      - Centralized log analysis and searching.
+      - Log-based alerting and dashboards.
+    avoid_when:
+      - Audit compliance logs (use Audit Log Service instead).
+    prerequisites:
+      - Cloud Logging entitlement.
+    security_notes:
+      - Role-based access to log spaces.
+      - Define log retention periods per compliance requirement.
+    runtime: [cloud-foundry, kyma, standalone]
+    related_services:
+      - alert-notification
+      - cloud-alm
+    official_docs_url: "https://help.sap.com/docs/cloud-logging"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/cloud-logging"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [operations, logging, observability, opensearch, monitoring]
+
+  - id: alert-notification
+    name: SAP Alert Notification Service
+    category: operations-observability
+    status: GA
+    short_description: >
+      Event-driven alerting and notification service. Routes alerts from BTP
+      services and applications to email, Slack, PagerDuty, webhooks, and more.
+    best_for:
+      - Proactive alerting on BTP service events.
+      - Routing operational notifications to the right team.
+    avoid_when:
+      - Log analysis and searching (use Cloud Logging).
+    prerequisites:
+      - Alert Notification entitlement.
+    security_notes:
+      - Webhook endpoints must be HTTPS.
+      - Secrets for notification channels stored securely.
+    runtime: [cloud-foundry, kyma, standalone]
+    related_services:
+      - cloud-logging
+      - cloud-alm
+    official_docs_url: "https://help.sap.com/docs/alert-notification"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/alert-notification"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [operations, alerting, notifications, monitoring]
+
+  - id: cloud-alm
+    name: SAP Cloud ALM
+    category: operations-observability
+    status: GA
+    short_description: >
+      Application lifecycle management platform for monitoring, implementation,
+      and operations of SAP cloud solutions. Includes health monitoring and
+      intelligent event correlation.
+    best_for:
+      - End-to-end SAP cloud solution monitoring.
+      - Implementation project management.
+      - SAP Activate methodology support.
+    avoid_when:
+      - Custom application logging (use Cloud Logging).
+    prerequisites:
+      - Cloud ALM entitlement (typically bundled with SAP Enterprise Support).
+    security_notes:
+      - IAS-based SSO.
+      - Role-based feature access.
+    runtime: [standalone]
+    related_services:
+      - cloud-logging
+      - alert-notification
+    official_docs_url: "https://help.sap.com/docs/cloud-alm"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/sap-cloud-alm"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [operations, alm, monitoring, implementation, lifecycle]
+
+  - id: cicd-service
+    name: SAP Continuous Integration & Delivery (CI/CD)
+    category: operations-observability
+    status: GA
+    short_description: >
+      Managed CI/CD pipeline service on BTP supporting CAP, Fiori, and Kyma
+      deployments. Pre-configured job templates for common SAP project types.
+    best_for:
+      - Automating build and deployment for CAP / Fiori / Kyma projects.
+      - Teams without existing CI/CD infrastructure.
+    avoid_when:
+      - Complex multi-stage enterprise pipelines (use Jenkins or GitHub Actions externally).
+    prerequisites:
+      - CI/CD Service entitlement.
+      - Git repository (GitHub, GitLab, Bitbucket).
+    security_notes:
+      - Store credentials in the CI/CD service credential store.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - transport-management
+      - cloud-alm
+    official_docs_url: "https://help.sap.com/docs/continuous-integration-and-delivery"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/continuous-integration-and-delivery"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [operations, cicd, devops, deployment, pipeline]
+
+  - id: transport-management
+    name: SAP Transport Management Service
+    category: operations-observability
+    status: GA
+    short_description: >
+      Manages the transport of MTA-based applications and configurations
+      across BTP subaccounts (DEV → TEST → PROD).
+    best_for:
+      - Controlled change propagation across environments.
+      - Audit trail of deployments.
+    avoid_when:
+      - Single-environment projects without multi-stage deployment.
+    prerequisites:
+      - Transport Management Service entitlement.
+    security_notes:
+      - Approval workflows for production transports.
+    runtime: [cloud-foundry, kyma]
+    related_services:
+      - cicd-service
+      - cloud-alm
+    official_docs_url: "https://help.sap.com/docs/transport-management-service"
+    discovery_center_url: "https://discovery-center.cloud.sap/serviceCatalog/transport-management-service"
+    verification_status: VERIFIED
+    last_verified: "2026-08-10"
+    tags: [operations, transport, deployment, change-management]
