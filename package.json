@@ -1,6 +1,6 @@
 {
   "name": "@ginesmr/sap-btp-agent-kit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Agent-friendly SAP BTP knowledge base with interactive installer for Claude Code, Cursor, OpenCode, GitHub Copilot and Pi.",
   "keywords": [
     "sap", "btp", "sap-btp", "agent", "llm", "mcp", "knowledge-base",
