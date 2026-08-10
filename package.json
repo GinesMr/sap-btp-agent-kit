@@ -1,5 +1,5 @@
 {
-  "name": "sap-btp-agent-kit",
+  "name": "@ginesmr/sap-btp-agent-kit",
   "version": "1.0.0",
   "description": "Agent-friendly SAP BTP knowledge base with skills, service catalog, guides and templates for CLI agents.",
   "keywords": [
@@ -31,6 +31,6 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "prepublishOnly": "node -e \"console.log('Publishing sap-btp-agent-kit v' + require('./package.json').version)\""
+    "prepublishOnly": "node -e \"console.log('Publishing @ginesmr/sap-btp-agent-kit v' + require('./package.json').version)\""
   }
 }
