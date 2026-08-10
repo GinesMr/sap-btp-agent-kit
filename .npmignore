@@ -1,0 +1,8 @@
+# Files not needed in the published npm package
+.gitattributes
+.gitignore
+*.log
+.env
+__pycache__/
+.DS_Store
+Thumbs.db
